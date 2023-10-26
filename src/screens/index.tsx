@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import {FlatList, Text, View, Alert} from 'react-native'
+import { useState, useRef } from 'react';
+import {FlatList, Text, View, Alert, TextInput} from 'react-native'
 import { styles } from "./styles";
 import { Header } from '../components/Header';
 import { Task } from '../components/Task';
@@ -9,23 +9,23 @@ import { uuid } from '../utils/uuid';
 
 
 export function HomeScreen(){
-    const [tasks, setTasks] = useState<TaskDTO[]>([
-    
-    ])
+    const [tasks, setTasks] = useState<TaskDTO[]>([])
     const [newTask, setNewTask] = useState('')
+    const newTaskInputRef = useRef<TextInput>(null)
 
     function handleTaskAdd(){
         if (newTask != '' && newTask.length >=5){
             setTasks((tasks) => [...tasks, {id: uuid(), isCompleted: false, title: newTask.trim()}])
         }
         setNewTask('')
+        newTaskInputRef.current?.blur()
     }
 
     function handleTaskDone(id: string){
         setTasks((tasks) => 
-        tasks.map((task) => {
-            task.id === id ? (task.isCompleted = !task.isCompleted ) : null
-            return task
+            tasks.map((task) => {
+                task.id === id ? (task.isCompleted = !task.isCompleted ) : null
+                return task
             }),
         )
     }   
@@ -49,7 +49,12 @@ export function HomeScreen(){
 
     return (
     <View style={styles.container}>
-         <Header task={newTask} onChangeText={setNewTask} onPress={handleTaskAdd}/>
+         <Header 
+            inputRef={newTaskInputRef}
+            task={newTask} 
+            onChangeText={setNewTask} 
+            onPress={handleTaskAdd}    
+        />
          <View style={styles.tasksContainer}>
             <View style={styles.info}>
                 <View style={styles.row}>
